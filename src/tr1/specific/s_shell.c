@@ -42,6 +42,7 @@ static void M_SetWindowPos(int32_t x, int32_t y, bool update);
 static void M_SetWindowSize(int32_t width, int32_t height, bool update);
 static void M_SetWindowMaximized(bool is_enabled, bool update);
 static void M_SetFullscreen(bool is_enabled, bool update);
+static void M_SetGLBackend(const GFX_GL_BACKEND backend);
 
 static void M_SetWindowPos(int32_t x, int32_t y, bool update)
 {
@@ -96,6 +97,28 @@ static void M_SetFullscreen(bool is_enabled, bool update)
         SDL_SetWindowFullscreen(
             m_Window, is_enabled ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
         SDL_ShowCursor(is_enabled ? SDL_DISABLE : SDL_ENABLE);
+    }
+}
+
+static void M_SetGLBackend(const GFX_GL_BACKEND backend)
+{
+    switch (backend) {
+    case GFX_GL_21:
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+        break;
+
+    case GFX_GL_33C:
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(
+            SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        break;
+
+    case GFX_GL_INVALID_BACKEND:
+        ASSERT_FAIL();
+        break;
     }
 }
 
@@ -235,28 +258,6 @@ int main(int argc, char **argv)
     Shell_Main();
     Shell_Terminate(0);
     return 0;
-}
-
-static void M_SetGLBackend(const GFX_GL_BACKEND backend)
-{
-    switch (backend) {
-    case GFX_GL_21:
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
-        break;
-
-    case GFX_GL_33C:
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-        SDL_GL_SetAttribute(
-            SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        break;
-
-    case GFX_GL_INVALID_BACKEND:
-        ASSERT_FAIL();
-        break;
-    }
 }
 
 void S_Shell_CreateWindow(void)
