@@ -12,6 +12,9 @@ on:
         description: "Do not require Mac builds to pass"
         required: false
         default: false
+  push:
+    branches:
+      - macos-tr2
 
 env:
   C_INCLUDE_PATH: /opt/local/include/uthash/:/opt/local/include/
@@ -34,7 +37,7 @@ jobs:
           security create-keychain -p "$MACOS_KEYCHAIN_PWD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$MACOS_KEYCHAIN_PWD" $KEYCHAIN_PATH
-          security import $CERTIFICATE_PATH -P "$MACOS_KEYCHAIN_PWD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH -T /usr/bin/codesign
+          security import $CERTIFICATE_PATH -P "$MACOS_CERTIFICATE_PWD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH -T /usr/bin/codesign
           security list-keychain -d user -s $KEYCHAIN_PATH
           security set-key-partition-list -S "apple-tool:,apple:,codesign:" -s -k $MACOS_KEYCHAIN_PWD $KEYCHAIN_PATH
 
@@ -75,14 +78,14 @@ jobs:
       - name: Build arm64 and create app bundle
         run: |
           BUILD_DIR=build-arm64
-          BUILD_OPTIONS="src/tr2 --prefix=/tmp/TR2X.app --bindir=Contents/MacOS --buildtype ${{ inputs.target }}"
+          BUILD_OPTIONS="src/tr2 --prefix=/tmp/TR2X.app --bindir=Contents/MacOS --buildtype release"
           meson setup $BUILD_DIR $BUILD_OPTIONS
           meson install -C $BUILD_DIR
 
       - name: Build x86-64
         run: |
           BUILD_DIR=build-x86-64
-          BUILD_OPTIONS="src/tr2 --prefix=/tmp/TR2X.app --bindir=Contents/MacOS --cross-file tools/shared/mac/x86-64_cross_file.txt --buildtype ${{ inputs.target }}"
+          BUILD_OPTIONS="src/tr2 --prefix=/tmp/TR2X.app --bindir=Contents/MacOS --cross-file tools/shared/mac/x86-64_cross_file.txt --buildtype release"
           meson setup $BUILD_DIR $BUILD_OPTIONS
           meson compile -C $BUILD_DIR
 
