@@ -36,6 +36,7 @@ static void M_RestoreTexture(GFX_3D_RENDERER *const renderer);
 
 static void M_Flush(GFX_3D_RENDERER *const renderer)
 {
+    LOG_INFO("renderer->config->line_width: %d", renderer->config->line_width);
     glLineWidth(renderer->config->line_width);
     glPolygonMode(
         GL_FRONT_AND_BACK,

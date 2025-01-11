@@ -35,6 +35,7 @@ static struct {
 static RENDERER *M_GetRenderer(void);
 static void M_ReuploadBackground(void);
 static void M_ResetPolyList(void);
+static void M_SetGLBackend(const GFX_GL_BACKEND backend);
 
 static RENDERER *M_GetRenderer(void)
 {
