@@ -15,6 +15,9 @@
 #include <libtrx/memory.h>
 #include <libtrx/utils.h>
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
+
 static RENDERER m_Renderer_SW = {};
 static RENDERER m_Renderer_HW = {};
 static RENDERER *m_PreviousRenderer = NULL;
@@ -66,6 +69,28 @@ static void M_ResetPolyList(void)
     RENDERER *const r = M_GetRenderer();
     if (r->ResetPolyList != NULL) {
         r->ResetPolyList(r);
+    }
+}
+
+static void M_SetGLBackend(const GFX_GL_BACKEND backend)
+{
+    switch (backend) {
+    case GFX_GL_21:
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+        break;
+
+    case GFX_GL_33C:
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(
+            SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        break;
+
+    case GFX_GL_INVALID_BACKEND:
+        ASSERT_FAIL();
+        break;
     }
 }
 

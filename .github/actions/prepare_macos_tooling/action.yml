@@ -1,5 +1,10 @@
 name: Cache TRX MacOS Dependencies
 
+on:
+  push:
+    branches:
+      - macos-tr2
+
 inputs:
   FFMPEG_INSTALL_TMP_ARM64:
     required: false
