@@ -36,17 +36,13 @@ static void M_RestoreTexture(GFX_3D_RENDERER *const renderer);
 
 static void M_Flush(GFX_3D_RENDERER *const renderer)
 {
-    LOG_INFO("renderer->config->line_width: %d", renderer->config->line_width);
     glLineWidth(renderer->config->line_width);
-    GFX_GL_CheckError();
-
     glPolygonMode(
         GL_FRONT_AND_BACK,
         renderer->config->enable_wireframe ? GL_LINE : GL_FILL);
     GFX_GL_CheckError();
 
     GFX_3D_VertexStream_RenderPending(&renderer->vertex_stream);
-    GFX_GL_CheckError();
 }
 
 static void M_SelectTextureImpl(
@@ -83,98 +79,47 @@ GFX_3D_RENDERER *GFX_3D_Renderer_Create(void)
     LOG_INFO("");
     GFX_3D_RENDERER *const renderer = Memory_Alloc(sizeof(GFX_3D_RENDERER));
     renderer->config = GFX_Context_GetConfig();
-    GFX_GL_CheckError();
 
     renderer->selected_texture_num = GFX_NO_TEXTURE;
     for (int i = 0; i < GFX_MAX_TEXTURES; i++) {
         renderer->textures[i] = NULL;
     }
 
-    LOG_INFO("");
     GFX_GL_Sampler_Init(&renderer->sampler);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Sampler_Bind(&renderer->sampler, 0);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Sampler_Parameterf(
         &renderer->sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Sampler_Parameteri(
         &renderer->sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Sampler_Parameteri(
         &renderer->sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    GFX_GL_CheckError();
 
-    LOG_INFO("");
     GFX_GL_Program_Init(&renderer->program);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_AttachShader(
         &renderer->program, GL_VERTEX_SHADER, "shaders/3d.glsl",
         renderer->config->backend);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_AttachShader(
         &renderer->program, GL_FRAGMENT_SHADER, "shaders/3d.glsl",
         renderer->config->backend);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_Link(&renderer->program);
-    GFX_GL_CheckError();
 
-    LOG_INFO("");
     renderer->loc_mat_projection =
         GFX_GL_Program_UniformLocation(&renderer->program, "matProjection");
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     renderer->loc_mat_model_view =
         GFX_GL_Program_UniformLocation(&renderer->program, "matModelView");
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     renderer->loc_texturing_enabled =
         GFX_GL_Program_UniformLocation(&renderer->program, "texturingEnabled");
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     renderer->loc_smoothing_enabled =
         GFX_GL_Program_UniformLocation(&renderer->program, "smoothingEnabled");
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     renderer->loc_alpha_point_discard =
         GFX_GL_Program_UniformLocation(&renderer->program, "alphaPointDiscard");
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     renderer->loc_alpha_threshold =
         GFX_GL_Program_UniformLocation(&renderer->program, "alphaThreshold");
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     renderer->loc_brightness_multiplier = GFX_GL_Program_UniformLocation(
         &renderer->program, "brightnessMultiplier");
-    GFX_GL_CheckError();
 
-    LOG_INFO("");
     GFX_GL_Program_FragmentData(&renderer->program, "fragColor");
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_Bind(&renderer->program);
-    GFX_GL_CheckError();
 
     GLfloat model_view[4][4] = {
         { +1.0f, +0.0f, +0.0f, +0.0f },
@@ -182,31 +127,17 @@ GFX_3D_RENDERER *GFX_3D_Renderer_Create(void)
         { +0.0f, +0.0f, +1.0f, +0.0f },
         { +0.0f, +0.0f, +0.0f, +1.0f },
     };
-
-    LOG_INFO("");
     GFX_GL_Program_UniformMatrix4fv(
         &renderer->program, renderer->loc_mat_model_view, 1, GL_FALSE,
         &model_view[0][0]);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_Uniform1i(
         &renderer->program, renderer->loc_alpha_point_discard, false);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_Uniform1f(
         &renderer->program, renderer->loc_alpha_threshold, -1.0);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_Uniform1f(
         &renderer->program, renderer->loc_brightness_multiplier, 1.0);
-    GFX_GL_CheckError();
 
-    LOG_INFO("");
     GFX_3D_VertexStream_Init(&renderer->vertex_stream);
-    GFX_GL_CheckError();
     return renderer;
 }
 
@@ -264,18 +195,14 @@ void GFX_3D_Renderer_Flush(GFX_3D_RENDERER *const renderer)
 
 void GFX_3D_Renderer_RenderEnd(GFX_3D_RENDERER *const renderer)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
 }
 
 void GFX_3D_Renderer_ClearDepth(GFX_3D_RENDERER *const renderer)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     glClear(GL_DEPTH_BUFFER_BIT);
     GFX_GL_CheckError();
 }
@@ -321,13 +248,11 @@ bool GFX_3D_Renderer_UnregisterEnvironmentMap(
 
 void GFX_3D_Renderer_FillEnvironmentMap(GFX_3D_RENDERER *const renderer)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
 
     GFX_GL_TEXTURE *const env_map = renderer->env_map_texture;
     if (env_map != NULL) {
         M_Flush(renderer);
-        LOG_INFO("after flush");
         GFX_GL_Texture_LoadFromBackBuffer(env_map);
         M_RestoreTexture(renderer);
     }
@@ -411,10 +336,8 @@ void GFX_3D_Renderer_RenderPrimList(
 void GFX_3D_Renderer_SelectTexture(
     GFX_3D_RENDERER *const renderer, int texture_num)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     renderer->selected_texture_num = texture_num;
     M_SelectTextureImpl(renderer, texture_num);
 }
@@ -422,20 +345,16 @@ void GFX_3D_Renderer_SelectTexture(
 void GFX_3D_Renderer_SetPrimType(
     GFX_3D_RENDERER *const renderer, GFX_3D_PRIM_TYPE value)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     GFX_3D_VertexStream_SetPrimType(&renderer->vertex_stream, value);
 }
 
 void GFX_3D_Renderer_SetTextureFilter(
     GFX_3D_RENDERER *const renderer, GFX_TEXTURE_FILTER filter)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     GFX_GL_Sampler_Parameteri(
         &renderer->sampler, GL_TEXTURE_MAG_FILTER,
         filter == GFX_TF_BILINEAR ? GL_LINEAR : GL_NEAREST);
@@ -451,10 +370,8 @@ void GFX_3D_Renderer_SetTextureFilter(
 void GFX_3D_Renderer_SetDepthWritesEnabled(
     GFX_3D_RENDERER *const renderer, const bool is_enabled)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     glDepthMask(is_enabled ? GL_TRUE : GL_FALSE);
     GFX_GL_CheckError();
 }
@@ -462,10 +379,8 @@ void GFX_3D_Renderer_SetDepthWritesEnabled(
 void GFX_3D_Renderer_SetDepthTestEnabled(
     GFX_3D_RENDERER *const renderer, const bool is_enabled)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     if (is_enabled) {
         glEnable(GL_DEPTH_TEST);
     } else {
@@ -477,10 +392,8 @@ void GFX_3D_Renderer_SetDepthTestEnabled(
 void GFX_3D_Renderer_SetDepthBufferEnabled(
     GFX_3D_RENDERER *const renderer, const bool is_enabled)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     glDepthFunc(is_enabled ? GL_LEQUAL : GL_ALWAYS);
     GFX_GL_CheckError();
 }
@@ -488,7 +401,6 @@ void GFX_3D_Renderer_SetDepthBufferEnabled(
 void GFX_3D_Renderer_SetBlendingMode(
     GFX_3D_RENDERER *const renderer, const GFX_BLEND_MODE blend_mode)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     if (renderer->selected_blend_mode == blend_mode) {
         return;
@@ -516,10 +428,8 @@ void GFX_3D_Renderer_SetBlendingMode(
 void GFX_3D_Renderer_SetAlphaPointDiscard(
     GFX_3D_RENDERER *const renderer, const bool is_enabled)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     GFX_GL_Program_Bind(&renderer->program);
     GFX_GL_Program_Uniform1f(
         &renderer->program, renderer->loc_alpha_point_discard, is_enabled);
@@ -528,10 +438,8 @@ void GFX_3D_Renderer_SetAlphaPointDiscard(
 void GFX_3D_Renderer_SetAlphaThreshold(
     GFX_3D_RENDERER *const renderer, const float value)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
     GFX_GL_Program_Bind(&renderer->program);
     GFX_GL_Program_Uniform1f(
         &renderer->program, renderer->loc_alpha_threshold, value);
@@ -540,26 +448,16 @@ void GFX_3D_Renderer_SetAlphaThreshold(
 void GFX_3D_Renderer_SetBrightnessMultiplier(
     GFX_3D_RENDERER *const renderer, const float value)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
-    LOG_INFO("after flush");
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_Bind(&renderer->program);
-    GFX_GL_CheckError();
-
-    LOG_INFO("");
     GFX_GL_Program_Uniform1f(
         &renderer->program, renderer->loc_brightness_multiplier, value);
-    GFX_GL_CheckError();
 }
 
 void GFX_3D_Renderer_SetTexturingEnabled(
     GFX_3D_RENDERER *const renderer, const bool is_enabled)
 {
-    LOG_INFO("");
     ASSERT(renderer != NULL);
     M_Flush(renderer);
     GFX_GL_Program_Bind(&renderer->program);
