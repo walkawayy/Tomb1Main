@@ -117,7 +117,7 @@ void Render_Init(void)
         SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
         LOG_DEBUG("Trying GL backend %d.%d", major, minor);
         if (GFX_Context_Attach(g_SDLWindow, backend)) {
-            GFX_Context_SetRenderingMode(GFX_RM_FRAMEBUFFER);
+            GFX_Context_SetRenderingMode(GFX_RM_LEGACY);
             m_FadeRenderer = GFX_FadeRenderer_Create();
             m_BackgroundRenderer = GFX_2D_Renderer_Create();
             Renderer_SW_Prepare(&m_Renderer_SW);
